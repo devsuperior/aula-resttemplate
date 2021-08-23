@@ -1,13 +1,11 @@
 package com.devsuperior.tutresttemplate.services;
 
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,55 +14,38 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.devsuperior.tutresttemplate.dto.CategoryDTO;
 import com.devsuperior.tutresttemplate.dto.PageDTO;
 import com.devsuperior.tutresttemplate.dto.ProductDTO;
 
 @Service
 public class ReportService {
 
-	@Value("${dscatalog.host}")
-	private String host;
-	
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	private String path;
+	private String host = "http://localhost:8080";
 	
-	public Map<String, Object> getReport(String bearerToken) {
-		Map<String, Object> map = new HashMap<>();
-		
-		path = host + "/products";
-		
-		ProductDTO dto = new ProductDTO(null, "TV Led", "TV Led", 2000.0, "", Instant.now().minusSeconds(8640000));
-		dto.getCategories().add(new CategoryDTO(1L, null));
-		
-		map.put("findById", findById(1L));
-		map.put("insert", insert(dto, bearerToken));
-		map.put("update", update(1L, dto, bearerToken));
-		map.put("delete", delete(1L, bearerToken));
-		map.put("findAll", findAll());
-		
-		return map;
-	}
+	private String path = host + "/products";
 
-	private ProductDTO findById(Long id) {
+	public ProductDTO findById(Long id) {
 		
 		Map<String, String> uriVariables = new HashMap<>();
 		uriVariables.put("id", id.toString());
+		
+		System.out.println(path + "/{id}");	
 		
 		ResponseEntity<ProductDTO> result = restTemplate.getForEntity(path + "/{id}", ProductDTO.class, uriVariables);
 		return result.getBody();
 	}
 	
 	//https://stackoverflow.com/questions/34647303/spring-resttemplate-with-paginated-api
-	private List<ProductDTO> findAll() {
+	public List<ProductDTO> findAll() {
 		ParameterizedTypeReference<PageDTO<ProductDTO>> responseType = new ParameterizedTypeReference<PageDTO<ProductDTO>>() { };
 		ResponseEntity<PageDTO<ProductDTO>> result = restTemplate.exchange(path, HttpMethod.GET, null, responseType);
 		return result.getBody().getContent();
 	}
 	
-	private ProductDTO insert(ProductDTO dto, String bearerToken) {
+	public ProductDTO insert(ProductDTO dto, String bearerToken) {
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", bearerToken);
@@ -75,7 +56,7 @@ public class ReportService {
 		return result.getBody();
 	}
 	
-	private ProductDTO update(Long id, ProductDTO dto, String bearerToken) {
+	public ProductDTO update(Long id, ProductDTO dto, String bearerToken) {
 		
 		Map<String, String> uriVariables = new HashMap<>();
 		uriVariables.put("id", id.toString());
@@ -89,7 +70,7 @@ public class ReportService {
 		return result.getBody();
 	}
 	
-	private Integer delete(Long id, String bearerToken) {
+	public Integer delete(Long id, String bearerToken) {
 		
 		Map<String, String> uriVariables = new HashMap<>();
 		uriVariables.put("id", id.toString());
