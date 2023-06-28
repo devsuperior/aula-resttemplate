@@ -12,9 +12,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.devsuperior.tutresttemplate.dto.GithubUserDTO;
 import com.devsuperior.tutresttemplate.dto.GithubUsersPageDTO;
+import com.devsuperior.tutresttemplate.dto.UserDetailsDTO;
 
 @Service
-public class ReportService {
+public class GithubService {
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -30,5 +31,10 @@ public class ReportService {
 		dto.setNext("http://localhost:8080/api/users?since=" + newSince);
 		
 		return dto;		
+	}
+
+	public UserDetailsDTO getUserDetails(String username) {
+		ResponseEntity<UserDetailsDTO> result = restTemplate.getForEntity("https://api.github.com/users/" + username, UserDetailsDTO.class);				
+		return result.getBody();
 	}	
 }
