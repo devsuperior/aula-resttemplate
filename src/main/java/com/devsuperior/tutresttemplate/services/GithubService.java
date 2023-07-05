@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import com.devsuperior.tutresttemplate.dto.GithubUserDTO;
 import com.devsuperior.tutresttemplate.dto.GithubUsersPageDTO;
 import com.devsuperior.tutresttemplate.dto.UserDetailsDTO;
+import com.devsuperior.tutresttemplate.dto.UserRepoDTO;
 
 @Service
 public class GithubService {
@@ -35,6 +36,15 @@ public class GithubService {
 
 	public UserDetailsDTO getUserDetails(String username) {
 		ResponseEntity<UserDetailsDTO> result = restTemplate.getForEntity("https://api.github.com/users/" + username, UserDetailsDTO.class);				
+		return result.getBody();
+	}
+
+	public List<UserRepoDTO> getUserRepos(String username) {
+		
+		ParameterizedTypeReference<List<UserRepoDTO>> responseType = new ParameterizedTypeReference<List<UserRepoDTO>>() { };
+		
+		ResponseEntity<List<UserRepoDTO>> result = restTemplate.exchange("https://api.github.com/users/" + username + "/repos", HttpMethod.GET, null, responseType);
+
 		return result.getBody();
 	}	
 }
